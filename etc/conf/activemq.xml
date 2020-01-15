@@ -1,0 +1,48 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" >
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+	
+ 
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="Execution_Core_Container_JSM_Broker" persistent="true" useJmx="true">
+		<destinations>
+			<queue physicalName="incoming" />
+			<queue physicalName="outcoming" />
+		</destinations>
+		<plugins>
+			<simpleAuthenticationPlugin anonymousAccessAllowed="true"> 
+				<users> 
+					<authenticationUser username="system" password="manager" groups="users,admins"/> 
+				</users> 
+			</simpleAuthenticationPlugin>
+		<!--  lets configure a destination based authorization mechanism -->
+		<authorizationPlugin>
+			<map>
+				<authorizationMap>
+					<authorizationEntries>
+						<authorizationEntry queue="incoming" read="admins,system,anonymous" write="admins,system,anonymous" admin="admins" />
+						<authorizationEntry queue="outcoming" read="admins,system,anonymous" write="admins,system,anonymous" admin="admins" />
+						<authorizationEntry topic="ActiveMQ.Advisory.>" read="system,anonymous" write="system,anonymous" admin="system,anonymous"/>
+						<authorizationEntry queue=">" write="admins" read="admins" admin="admins" />
+						<authorizationEntry topic=">" write="admins" read="admins" admin="admins" />
+					</authorizationEntries>
+					<tempDestinationAuthorizationEntry>
+						<tempDestinationAuthorizationEntry read="admin" write="admin" admin="admin"/>
+					</tempDestinationAuthorizationEntry>
+				</authorizationMap>
+			</map>
+		</authorizationPlugin>
+		</plugins>
+        <persistenceAdapter>
+            <memoryPersistenceAdapter />
+        </persistenceAdapter>
+        <transportConnectors>
+            <transportConnector name="openwire" uri="tcp://0.0.0.0:61816?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600" />
+        </transportConnectors>
+    </broker>
+    <import resource="routes.xml"/>
+    <import resource="jetty.xml"/>
+</beans>
