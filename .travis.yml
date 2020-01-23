@@ -6,10 +6,13 @@ sudo: required
 services:
   - docker
 
-env:
-  ACTIVEMQ_VERSION: 5.14.3
+# env:
+#   ACTIVEMQ_VERSION: 5.14.3
   
-dist: bionic
+dist: trusty
+
+jdk:
+  - openjdk12
 
 # install:
   #   - ./travis-test-docker/wait-for-it/wait-for-it.sh
@@ -36,7 +39,7 @@ dist: bionic
 script:
   - docker-compose build 
   - docker-compose up
-  - curl -k -request GET 'https://10.40.202.121:8450/about/version'
+  - curl -k -request GET 'https://10.40.202.170:8450/about/version'
   - docker-compose down
 # - stage: test
 # script: 
